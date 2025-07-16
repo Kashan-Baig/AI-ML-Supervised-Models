@@ -62,14 +62,14 @@ def form():
 
         df = pd.DataFrame([data])
 
-        # 🔶 Apply log1p on required numeric columns
+        
         for col in ['person_age', 'person_income', 'loan_amnt', 'loan_percent_income']:
             df[col] = np.log1p(df[col])
 
-        # 🔷 Predict
+      
         pred = model.predict(df)[0]
 
-        risk = "Low Risk" if pred == 1 else "High Risk"
+        risk = "Approved" if pred == 1 else "Disapproved"
         prediction = risk
         color = "green" if pred == 1 else "red"
 
