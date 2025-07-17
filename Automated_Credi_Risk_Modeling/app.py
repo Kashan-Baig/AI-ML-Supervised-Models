@@ -37,6 +37,7 @@ def predict():
 
 from flask import Flask, request, render_template_string
 import pandas as pd
+import numpy as np  
 
 app = Flask(__name__)
 
@@ -45,34 +46,79 @@ def form():
     prediction = None
     risk = None
     color = None
+    error_message = None
+    disqualify_reason = None
 
     if request.method == 'POST':
-        data = {
-            'person_age': float(request.form['person_age']),
-            'person_education': request.form['person_education'],
-            'person_income': float(request.form['person_income']),
-            'person_home_ownership': request.form['person_home_ownership'],
-            'loan_amnt': float(request.form['loan_amnt']),
-            'loan_intent': request.form['loan_intent'],
-            'loan_int_rate': float(request.form['loan_int_rate']),
-            'loan_percent_income': float(request.form['loan_percent_income']),
-            'credit_score': float(request.form['credit_score']),
-            'previous_loan_defaults_on_file': request.form['previous_loan_defaults_on_file']
-        }
+        try:
+            # Collect data
+            data = {
+                'person_age': float(request.form['person_age']),
+                'person_education': request.form['person_education'],
+                'person_income': float(request.form['person_income']),
+                'person_home_ownership': request.form['person_home_ownership'],
+                'loan_amnt': float(request.form['loan_amnt']),
+                'loan_intent': request.form['loan_intent'],
+                'loan_int_rate': float(request.form['loan_int_rate']),
+                'loan_percent_income': float(request.form['loan_percent_income']),
+                'credit_score': float(request.form['credit_score']),
+                'previous_loan_defaults_on_file': request.form['previous_loan_defaults_on_file']
+            }
 
-        df = pd.DataFrame([data])
+            # Strict age check
+            if data['person_age'] <= 0:
+                raise ValueError("Age must be greater than 0")
 
-        
-        for col in ['person_age', 'person_income', 'loan_amnt', 'loan_percent_income']:
-            df[col] = np.log1p(df[col])
+            # Soft business rule disqualifications
+            disqualify = False
 
-      
-        pred = model.predict(df)[0]
+            if data['person_age'] < 18:
+                disqualify = True
+            elif data['person_income'] < 10000:
+                disqualify = True
+                disqualify_reason = "Income below $10,000"
+            elif data['loan_amnt'] <= 0:
+                disqualify = True
+                disqualify_reason = "Loan amount must be positive"
+            elif data['loan_int_rate'] <= 0:
+                disqualify = True
+                disqualify_reason = "Interest rate must be positive"
+            elif data['loan_percent_income'] <= 0 or data['loan_percent_income'] > 0.5:
+                disqualify = True
+                disqualify_reason = "Loan percent income must be between 0 and 0.5"
+            elif data['credit_score'] < 300 or data['credit_score'] > 850:
+                disqualify = True
+                disqualify_reason = "Credit score must be between 300 and 850"
+            elif (data['person_income'] / data['loan_amnt']) < 0.1:
+                disqualify = True
+                disqualify_reason = "Income too low compared to loan amount"
+            elif data['loan_percent_income'] > 0.35:
+                disqualify = True
+                disqualify_reason = "Debt-to-income ratio too high"
 
-        risk = "Approved" if pred == 1 else "Disapproved"
-        prediction = risk
-        color = "green" if pred == 1 else "red"
+            df = pd.DataFrame([data])
 
+            # Feature transformations
+            for col in ['person_age', 'person_income', 'loan_amnt', 'loan_percent_income']:
+                df[col] = np.log1p(df[col])
+
+            # Prediction logic
+            if disqualify:
+                prediction = "Disapproved"
+                color = "red"
+            else:
+                pred = model.predict(df)[0]
+                prediction = "Approved" if pred == 1 else "Disapproved"
+                color = "green" if pred == 1 else "red"
+
+        except ValueError as e:
+            error_message = str(e)
+            color = "red"
+        except Exception as e:
+            error_message = "An error occurred during processing"
+            color = "red"
+
+    # HTML Template
     return render_template_string('''
 <html>
 <head>
@@ -81,27 +127,27 @@ def form():
         body {
             margin: 0;
             padding: 0;
-            background-color: #1f2a40; /* Navy blue background */
+            background-color: #1f2a40;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #ffffff;
         }
         .container {
             max-width: 700px;
             margin: 50px auto;
-            background-color: #27344f; /* Darker navy for card */
+            background-color: #27344f;
             padding: 40px;
             border-radius: 15px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
         }
         h1 {
             text-align: center;
-            color: #ff9800; /* Orange */
+            color: #ff9800;
             margin-bottom: 30px;
         }
         label {
             display: block;
             margin-bottom: 5px;
-            color: #ffcc80; /* Light orange */
+            color: #ffcc80;
         }
         input, select {
             width: 100%;
@@ -127,19 +173,22 @@ def form():
             padding-top: 20px;
             border-top: 1px solid #ff9800;
         }
-        .result h2 {
-            font-size: 24px;
-        }
-        .result p {
-            font-size: 18px;
+        .error {
+            color: #ff5252;
+            text-align: center;
+            margin: 15px 0;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Automated Credit Risk Modelling</h1>
+        {% if error_message %}
+        <div class="error">{{ error_message }}</div>
+        {% endif %}
         <form method="POST">
-            <label>Age:</label>
+            <label>Age: </label>
             <input type="number" name="person_age" required>
 
             <label>Education:</label>
@@ -148,7 +197,7 @@ def form():
                 <option>Associate</option><option>Doctorate</option>
             </select>
 
-            <label>Income:</label>
+            <label>Income: </label>
             <input type="number" name="person_income" required>
 
             <label>Ownership:</label>
@@ -157,7 +206,7 @@ def form():
             </select>
 
             <label>Loan Amount:</label>
-            <input type="number" name="loan_amnt" required>
+            <input type="number" name="loan_amnt" min="1" required>
 
             <label>Loan Intent:</label>
             <select name="loan_intent" required>
@@ -165,13 +214,13 @@ def form():
                 <option>DEBTCONSOLIDATION</option><option>HOMEIMPROVEMENT</option><option>PERSONAL</option>
             </select>
 
-            <label>Interest Rate:</label>
-            <input type="number" step="0.01" name="loan_int_rate" required>
+            <label>Interest Rate (%):</label>
+            <input type="number" step="0.01" name="loan_int_rate" min="0.01" required>
 
             <label>Percent Income:</label>
-            <input type="number" step="0.01" name="loan_percent_income" required>
+            <input type="number" step="0.01" name="loan_percent_income" min="0.01" required>
 
-            <label>Credit Score:</label>
+            <label>Credit Score :</label>
             <input type="number" name="credit_score" required>
 
             <label>Defaults:</label>
@@ -185,12 +234,15 @@ def form():
         {% if prediction %}
         <div class="result">
             <h2 style="color: {{ color }};"><strong>Prediction:</strong> {{ prediction }}</h2>
+            {% if prediction == "Disapproved" and disqualify_reason %}
+            <p><strong>Reason:</strong> {{ disqualify_reason }}</p>
+            {% endif %}
         </div>
         {% endif %}
     </div>
 </body>
 </html>
-    ''', prediction=prediction, color=color)
+    ''', prediction=prediction, color=color, error_message=error_message, disqualify_reason=disqualify_reason)
 
 
 
