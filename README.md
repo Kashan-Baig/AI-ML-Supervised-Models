@@ -6,6 +6,18 @@ This repository showcases a collection of supervised machine learning projects d
 
 ## 📂 Projects Included
 
+### 🔹 Resume Category Predictor (NLP Classification)
+- Classifies resumes or job descriptions into roles (e.g., Data Scientist, Web Developer, HR, etc.).
+- Built using **Natural Language Processing (NLP)** techniques:
+  - Text cleaning, tokenization, stopword removal, TF-IDF vectorization.
+- Trained using **CatBoost & Pycaret** and evaluated on accuracy & F1-score.
+- Deployed using **Flask** with:
+  - Interactive web form input  
+  - `/predict` API for integration
+- Includes input validation and feedback for short or incomplete resumes.
+
+---
+
 ### 🔹 Credit Risk Prediction (Classification)
 - Predicts loan approval risk (High Risk / Low Risk) using borrower features.
 - Includes feature engineering (log transformation, encoding, outlier removal).
@@ -15,11 +27,15 @@ This repository showcases a collection of supervised machine learning projects d
   - `/predict` POST API endpoint  
 - Handles imbalanced data and supports real-time inference.
 
+---
+
 ### 🔹 Laptop Price Prediction (Regression)
 - Predicts laptop prices based on specs like processor, RAM, SSD, brand, etc.
 - Preprocessing includes encoding, skewness correction, and scaling.
 - Models: **Linear Regression**, **XGBoost**.
 - Deployed using **Streamlit** for an interactive web UI.
+
+---
 
 ### 🔹 California Housing Price Prediction (Regression)
 - Predicts property prices using the California Housing dataset.
@@ -33,6 +49,7 @@ This repository showcases a collection of supervised machine learning projects d
 - Python (Pandas, NumPy, Scikit-learn, XGBoost)
 - Flask, Streamlit
 - Matplotlib, Seaborn
+- TF-IDF, Regex, NLP preprocessing
 - GridSearchCV for hyperparameter tuning
 
 ---
