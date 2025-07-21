@@ -1,0 +1,85 @@
+body {
+    margin: 0;
+    padding: 40px;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f8;
+    color: #1c1e21;
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.title-section {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.cards {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    flex: 1;
+    min-width: 400px;
+    max-width: 500px;
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+input[type="file"],
+textarea {
+    height: 300px;
+    width: 95%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    padding: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fafafa;
+    font-size: 14px;
+    resize: vertical;
+}
+
+input[type="submit"] {
+    padding: 12px 24px;
+    background: #6366f1;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background: #4f46e5;
+}
+
+pre {
+    background-color: #f0f0f5;
+    padding: 20px;
+    border-radius: 10px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+}
