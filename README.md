@@ -6,6 +6,43 @@ This repository showcases a collection of supervised machine learning projects d
 
 ## 📂 Projects Included
 
+### 🏨 Hotel Review Rating Predictor (LuxRate)
+
+An AI-powered system that predicts star ratings (1-5) from hotel review text using supervised machine learning. This end-to-end solution covers NLP preprocessing, model training, and web deployment.
+
+![System Screenshot](https://i.imgur.com/JK7w3Vg.png) *(Add your screenshot URL here)*
+
+#### ✨ Features
+
+- **Text Analysis**: Processes raw review text with advanced NLP techniques
+- **Rating Prediction**: Predicts star ratings (1-5) with >85% accuracy
+- **Web Interface**: Beautiful, responsive UI with hotel-themed design
+- **API Endpoint**: `/predict` endpoint for integration with other systems
+- **Insight Generation**: Identifies key positive/negative aspects from reviews
+
+#### 🛠️ Technologies Used
+
+##### Core ML
+- Python 3.8+
+- Scikit-learn
+- NLTK/spaCy for text processing
+- TF-IDF/Word2Vec embeddings
+- CatBoost/XGBoost classifiers
+
+##### Deployment
+- Flask backend
+- HTML5/CSS3 frontend
+- Modern UI with hotel imagery
+- Responsive design (mobile-friendly)
+
+##### Data Processing
+- Pandas/Numpy
+- Regex text cleaning
+- Custom tokenization
+- Sentiment analysis features
+
+
+
 ### 🔹 Resume Category Predictor (NLP Classification)
 - Classifies resumes or job descriptions into roles (e.g., Data Scientist, Web Developer, HR, etc.).
 - Built using **Natural Language Processing (NLP)** techniques:
