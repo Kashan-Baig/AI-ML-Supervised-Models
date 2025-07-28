@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HotelSentiment AI Analyzer</title>
+    <!-- Favicon links -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <!-- For modern browsers -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <div class="container">
+        <div class="header">
+            <h1>HotelSentiment AI</h1>
+            <p class="subtitle">From Words to Ratings — Instantly</p>
+        </div>
+        
+        <div class="card">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="review"><strong>Share your hotel experience</label>
+                    <textarea id="review" name="resume" placeholder="Share your experience — Was the room clean? Staff friendly? Food good?" required>{{ request.form['resume'] if request.method == 'POST' else '' }}</textarea>
+                </div>
+                <button type="submit" class="predict-button" id="predictBtn">
+                    <span>Predict Rating</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <script>
+                    document.getElementById('review').addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            document.getElementById('predictBtn').click();
+                        }
+                    });
+                </script>
+            </form>
+
+            {% if prediction %}
+                <div class="result-card">
+                    <div class="rating-display">
+                        <div class="stars">
+                            {% for i in range(5) %}
+                                <span class="star {% if i < prediction|int %}filled{% endif %}">★</span>
+                            {% endfor %}
+                        </div>
+                        <span class="rating-value">{{ prediction }}/5</span>
+                    </div>
+                    <div class="review-excerpt">
+                        <h3>Your Review:</h3>
+                        <p>"{{ original_text[:150] }}{% if original_text|length > 150 %}...{% endif %}"</p>
+                    </div>
+                    <!-- <div class="insights">
+                        <h3>Key Insights:</h3>
+                        <ul>
+                            <li>Positive mention of {% if "room" in original_text|lower %}room quality{% else %}service{% endif %}</li>
+                            <li>{% if "view" in original_text|lower %}Great views mentioned{% else %}Comfort highlighted{% endif %}</li>
+                        </ul>
+                    </div> -->
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="footer">
+            <p>Powered by AI • Providing accurate rating predictions since 2023</p>
+        </div>
+    </div>
+</body>
+</html>
