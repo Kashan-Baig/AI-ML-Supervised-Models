@@ -46,9 +46,8 @@ def hotel_rev():
         matched = sum(1 for word in tokens if word in known_words)
         match_ratio = matched / len(tokens) if tokens else 0
 
-        if len(cleaned_text.split()) < 5:
-            prediction = "Please enter a more detailed review."
-        elif match_ratio < 0.3:
+
+        if match_ratio < 0.3:
             prediction = "Your review contains too many unknown or irrelevant words."
         else:
             vect = vectorizer.transform([cleaned_text])
